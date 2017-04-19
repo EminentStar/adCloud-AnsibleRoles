@@ -1,0 +1,26 @@
+---
+- name: Downlaod kong rpm
+  become: true
+  become_user: root
+  shell: wget {{ kong_rpm }}
+
+- name: Downlaod kong bintray rpm
+  become: true
+  become_user: root
+  shell: wget {{ kong_bintray_rpm }}
+
+- name: Install kong
+  become: true
+  become_user: root
+  shell: EL_VERSION=`cat /etc/redhat-release | grep -oE '[0-9]+\.[0-9]+'` && \ sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${EL_VERSION%.*}.noarch.rpm
+
+
+- name: Create kong user in postgresql
+  become: true
+  become_user: root
+  shell:  
+
+- name: Start kong
+  become: true
+  become_user: root
+  shell: 
