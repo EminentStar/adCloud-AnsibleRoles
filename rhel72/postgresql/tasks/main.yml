@@ -1,0 +1,36 @@
+---
+- name: Install useful tools
+  become: true
+  become_user: root
+  yum: pkg={{item}} state=installed
+  with_items:
+   - vim
+   - wget
+
+- name: Download postgres RPM package
+  become: true
+  become_user: root
+  shell: sudo rpm -Uvh {{ psql_rpm }}
+
+- name: Install postgresql
+  become: true
+  become_user: root
+  yum: pkg={{item}} state=installed
+  with_items:
+   - postgresql95-server
+   - postgresql95
+
+- name: Initialize database
+  become: true
+  become_user: root
+  shell: /usr/pgsql-9.5/bin/postgresql95-setup initdb
+
+- name: Start postgresql
+  become: true
+  become_user: root
+  shell: systemctl start postgresql-9.5
+
+- name: Enable postgresql
+  become: true
+  become_user: root
+  shell: systemctl enable postgresql-9.5
