@@ -1,4 +1,21 @@
 ---
+- name: Create postgresql user
+  postgresql_user:
+    login_user: "{{ postgresql_id }}"
+    login_password: "{{ postgresql_password }}"
+    name: kong
+    password: kong
+
+- name: Create postgresql database
+  postgresql_db:
+    login_user: "{{ postgresql_id }}"
+    login_password: "{{ postgresql_password }}"
+    name: kong
+    encoding: UTF-8
+    lc_collate: en_US.UTF-8
+    lc_ctype: en_US.UTF-8
+    owner: kong
+
 - name: Downlaod kong rpm
   become: true
   become_user: root
@@ -9,18 +26,33 @@
   become_user: root
   shell: wget {{ kong_bintray_rpm }}
 
-- name: Install kong
+- name: Install kong(1)
   become: true
   become_user: root
-  shell: EL_VERSION=`cat /etc/redhat-release | grep -oE '[0-9]+\.[0-9]+'` && \ sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${EL_VERSION%.*}.noarch.rpm
+  yum: 
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
 
-
-- name: Create kong user in postgresql
+- name: Install kong(2)
   become: true
   become_user: root
-  shell:  
+  yum: 
+    name: "{{ kong_rpm_name }}"
+    disable_gpg_check: yes
+    state: present
+
+- name: Copy kong.conf
+  become: true
+  become_user: root
+  copy: src=kong.conf dest=/etc/kong/kong.conf
+
+- name: Copy shell script starting kong
+  become: true
+  become_user: ec2-user
+  copy: src=start_kong.sh dest=/home/ec2-user/start_kong.sh
+
 
 - name: Start kong
   become: true
-  become_user: root
-  shell: 
+  become_user: ec2-user
+  shell: sh /home/ec2-user/start_kong.sh
