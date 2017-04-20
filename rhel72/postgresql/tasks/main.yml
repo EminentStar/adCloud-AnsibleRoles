@@ -6,11 +6,13 @@
   with_items:
    - vim
    - wget
+   - postgresql-libs
+   - python-psycopg2
 
 - name: Download postgres RPM package
   become: true
   become_user: root
-  shell: sudo rpm -Uvh {{ psql_rpm }}
+  shell: rpm -Uvh {{ psql_rpm }}
 
 - name: Install postgresql
   become: true
@@ -25,6 +27,16 @@
   become_user: root
   shell: /usr/pgsql-9.5/bin/postgresql95-setup initdb
 
+- name: Copy pg_hba.conf before changing password
+  become: true
+  become_user: root
+  copy: src=pg_hba_before.conf dest=/var/lib/pgsql/9.5/data/pg_hba.conf
+
+- name: Copy shell script changing postgres password
+  become: true
+  become_user: ec2-user
+  template: src=password_change.sh.j2 dest=/home/ec2-user/password_change.sh owner=ec2-user group=ec2-user
+
 - name: Start postgresql
   become: true
   become_user: root
@@ -34,3 +46,18 @@
   become: true
   become_user: root
   shell: systemctl enable postgresql-9.5
+
+- name: Change postgres password
+  become: true
+  become_user: ec2-user
+  shell: sh /home/ec2-user/password_change.sh
+
+- name: Copy pg_hba.conf after changing password
+  become: true
+  become_user: root
+  copy: src=pg_hba_after.conf dest=/var/lib/pgsql/9.5/data/pg_hba.conf
+
+- name: Restart postgresql
+  become: true
+  become_user: root
+  shell: systemctl restart postgresql-9.5
