@@ -1,4 +1,1 @@
-rhel72/postgresql/vars/main.yml
-
-rhel72/kong/vars/main.yml
 rhel72/kong/files/kong.conf
