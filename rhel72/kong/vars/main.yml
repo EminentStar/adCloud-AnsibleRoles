@@ -1,4 +1,8 @@
 ---
 domain: kaiserad.net
-kong_rpm: https://github.com/Mashape/kong/releases/download/0.10.0/kong-0.10.0.el7.noarch.rpm
+kong_rpm_name: kong-0.10.0.el7.noarch.rpm
+kong_rpm: https://github.com/Mashape/kong/releases/download/0.10.0/{{ kong_rpm_name }}
 kong_bintray_rpm: https://bintray.com/mashape/kong-rpm-el7-0.10.x
+
+postgresql_id: <POSTGRES_ID>
+postgresql_password: <POSTGRES_PASSWORD>
